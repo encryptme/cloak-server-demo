@@ -4,8 +4,8 @@
 
 # Check for certificate renewals once per day.
 - name: PKI cron job
-  cron: cron_file=cloak user=cloak special_time=daily job=/home/cloak/bin/update-pki.sh
+  cron: cron_file=cloak name=update-pki user=cloak special_time=daily job=/home/cloak/bin/update-pki.sh
 
 # Check for updated CRLs every minute.
 - name: CRL cron job
-  cron: cron_file=cloak user=cloak job=/home/cloak/bin/refresh-crls.sh
+  cron: cron_file=cloak name=refresh-crls user=cloak job=/home/cloak/bin/refresh-crls.sh

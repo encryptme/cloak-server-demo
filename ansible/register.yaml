@@ -6,7 +6,24 @@
   tasks:
     - user: name=cloak uid=2000 shell=/bin/bash home=/home/cloak
     - copy: "dest=/etc/sudoers.d/cloak content='cloak ALL=(ALL) NOPASSWD:ALL\n' owner=root group=root mode=0440"
-      
+
+
+# This is for targeting a sandbox deployment of the Cloak web service. There's
+# no need to do any of this in your own deployments.
+- hosts: all
+  become: true
+  become_user: cloak
+  gather_facts: false
+
+  vars:
+    - name: cloak_base_url
+      #value: https://www.getcloak.com/
+      value: http://192.168.128.12/
+
+  pre_tasks:
+    - name: Initialize .cloak.conf
+      template: dest=/home/cloak/.cloak.conf src=templates/cloak.conf
+
 
 - hosts: all
   become: true
@@ -22,10 +39,6 @@
     - name: cloak_target
       prompt: "Enter the target identifier (from your team dashboard)"
       private: no
-    - name: cloak_base_url
-      prompt: "Cloak base URL (for internal use)"
-      private: no
-      default: "https://www.getcloak.com/"
 
   tasks:
     # Create some subdirectories that we'll need.
@@ -51,11 +64,8 @@
 
     - name: Link cloak-server into /home/cloak/bin
       file: path=/home/cloak/bin/cloak-server src=/home/cloak/venv/bin/cloak-server state=link
-
-    # Finally, we use the API client to register the server.
-    - name: Initialize .cloak.conf
-      template: dest=/home/cloak/.cloak.conf src=templates/cloak.conf
     
+    # Finally, we use the API client to register the server.
     - name: Register this server
       command: /home/cloak/bin/cloak-server register --email {{cloak_email}} --password {{cloak_password}} --target {{cloak_target}}
 

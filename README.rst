@@ -1,7 +1,7 @@
 cloak-server-demo
 =================
 
-This projects demonstrates the steps necessary to set up a private Cloak team
+This project demonstrates the steps necessary to set up a private Cloak team
 endpoint. It takes the form of a pair of Ansible playbooks that can be thought
 of as executable documentation. Running these against a clean install of Ubuntu
 16.04 will produce a minimal but functional Cloak endpoint to examine. It is
@@ -23,8 +23,7 @@ VPS is fine for our purposes. The machine obviously needs to be reachable via
 the FQDN that you used to register the target.
 
 Finally, you'll need `ansible`_ available in your shell. This demo was
-originally developed with ansible 2.2.1.0. As always, we recommend installing it
-into a Python virtualenv.
+originally developed with ansible 2.2.1.
 
 Once you have all the pieces in place, the first step is to tell us where your
 server is. Create a file named ``hosts`` in the ``ansible`` directory. This is
@@ -34,7 +33,8 @@ something like this:
     cloak.example.com   ansible_ssh_user=ubuntu
 
 Of course, you should substitute the FQDN or IP of your server and set any ssh
-parameters needed to talk to it.
+parameters needed to talk to it. If the SSH user is not root, it must have
+unencumbered sudo access.
 
 
 .. _ansible: https://www.ansible.com/
@@ -48,9 +48,7 @@ Deploying a demo server is a two-step process, starting with registration. This
 will install the `cloak-server`_ command-line interface to our API and register
 the server with your team. In order to do this, you will be prompted for your
 Cloak email address and password and the identifier of the target this server
-belongs to (which you get through your team dashboard). It may also prompt for a
-base URL, but this is for testing against sandboxes; just accept the default for
-production teams.
+belongs to (which you get through your team dashboard).
 
     ansible-playbook ansible/register.yaml
 
@@ -83,7 +81,7 @@ will block, so you should go do that now.
 
 The rest of ``deploy.yaml`` is a relatively routine matter of installing
 packages and rendering configuration files. It also installs some cron jobs to
-periodically check for updated certificates and CRLs. They playbooks are well
+periodically check for updated certificates and CRLs. The playbooks are well
 documented, so you can refer to them directly for the details.
 
 
