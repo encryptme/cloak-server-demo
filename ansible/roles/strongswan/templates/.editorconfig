@@ -1,0 +1,4 @@
+root = false
+
+[ipsec.conf]
+trim_trailing_whitespace = false
