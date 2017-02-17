@@ -1,3 +1,6 @@
+- name: Upgrade cloak-server
+  pip: name=cloak-server virtualenv=/home/cloak/venv state=latest
+
 - name: Download the PKI (will wait for certificate approval)
   command: /home/cloak/bin/cloak-server pki --out /home/cloak/pki --wait
   async: 300

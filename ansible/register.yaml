@@ -8,26 +8,15 @@
     - copy: "dest=/etc/sudoers.d/cloak content='cloak ALL=(ALL) NOPASSWD:ALL\n' owner=root group=root mode=0440"
 
 
-# This is for targeting a sandbox deployment of the Cloak web service. There's
-# no need to do any of this in your own deployments.
 - hosts: all
   become: true
   become_user: cloak
-  gather_facts: false
 
-  vars:
-    - name: cloak_base_url
-      #value: https://www.getcloak.com/
-      value: http://192.168.128.12/
-
+  # This is just for development and testing. There's no need to do this in
+  # your own deployments.
   pre_tasks:
     - name: Initialize .cloak.conf
       template: dest=/home/cloak/.cloak.conf src=templates/cloak.conf
-
-
-- hosts: all
-  become: true
-  become_user: cloak
 
   vars_prompt:
     - name: cloak_email
