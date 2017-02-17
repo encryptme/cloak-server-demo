@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+"""
+Populates the cloak_server ansible fact with the server info, as documented by
+the API.
+"""
+
+import json
+import subprocess
+
+
+def main():
+    module = AnsibleModule(argument_spec={})
+
+    try:
+        output = subprocess.check_output(['/home/cloak/bin/cloak-server', 'info', '--json'])
+    except subprocess.CalledProcessError as e:
+        module.fail_json(msg=unicode(e))
+    else:
+        module.exit_json(
+            changed=False,
+            ansible_facts={
+                'cloak_server': json.loads(output),
+            },
+        )
+
+
+from ansible.module_utils.basic import *  # noqa
+main()

@@ -1,0 +1,10 @@
+- name: Install OpenVPN
+  apt: name=openvpn
+
+# The API is permitted to return multiple OpenVPN configurations. Initially,
+# private team targets will only have a single config, but it's easy enough to
+# be future-proof.
+- name: Configure openvpn
+  template: dest=/etc/openvpn/cloak-{{item.proto}}.conf src=cloak-server.conf
+  with_items: "{{ cloak_server.target.openvpn }}"
+  notify: Restart openvpn

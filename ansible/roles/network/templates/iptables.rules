@@ -1,0 +1,45 @@
+# vim:ft=ipfilter
+
+*filter
+
+# Allow all loopback (lo0) traffic and drop all traffic to 127/8 that doesn't use lo0.
+-A INPUT -i lo -j ACCEPT
+-A INPUT ! -i lo -d 127.0.0.0/8 -j REJECT
+
+# Accept all established inbound connections.
+-A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# SSH
+-A INPUT -p tcp --dport ssh -j ACCEPT
+
+# OpenVPN
+{% for config in cloak_server.target.openvpn %}
+-A INPUT -p {{config.proto}} --dport {{config.port}} -j ACCEPT
+{% endfor %}
+
+# IPsec, isakmp, NAT-T
+-A INPUT -p 50 -j ACCEPT
+-A INPUT -p udp --dport 500 -j ACCEPT
+-A INPUT -p udp --dport 4500 -j ACCEPT
+
+# DNS through the tunnel
+-A INPUT -s 10.137.0.0/16 -p udp --dport domain -j ACCEPT
+-A INPUT -s 10.137.0.0/16 -p tcp --dport domain -j ACCEPT
+
+# Everything else
+-A INPUT -j REJECT
+
+
+# Isolate all private addresses. In particular, don't let users see each other.
+-A FORWARD -s 10.0.0.0/8 -d 10.0.0.0/8 -j DROP
+
+COMMIT
+
+
+*nat
+
+# Act as a NAT for all VPN clients. You may wish to use a dedicated egress IP,
+# but we'll just use the primary one here.
+-A POSTROUTING -s 10.137.0.0/16 -j SNAT --to-source {{ansible_default_ipv4.address}} --random
+
+COMMIT

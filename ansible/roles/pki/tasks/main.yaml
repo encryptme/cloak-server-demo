@@ -1,0 +1,10 @@
+- name: Download the PKI (will wait for certificate approval)
+  command: /home/cloak/bin/cloak-server pki --out /home/cloak/pki --wait
+  async: 300
+  poll: 1
+
+- name: Initialize CRLs
+  shell: '/home/cloak/bin/cloak-server crls --out /home/cloak/pki/crls --format pem --post-hook "cat /home/cloak/pki/crls/*.pem > /home/cloak/pki/crls.pem" `cat /home/cloak/pki/crl_urls.txt`'
+
+- name: Diffie-Hellman parameters
+  copy: dest=/home/cloak/pki/dh2048.pem src=dh2048.pem

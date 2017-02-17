@@ -1,0 +1,5 @@
+- name: procps
+  command: /usr/sbin/service procps start
+
+- name: Restore iptables
+  command: /etc/network/if-up.d/iptables

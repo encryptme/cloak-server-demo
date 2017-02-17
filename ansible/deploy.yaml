@@ -1,0 +1,31 @@
+- hosts: all
+  become: true
+
+  pre_tasks:
+    # This calls `cloak-server info --json` and puts the result into the
+    # cloak_server variable.
+    - name: Gather server information
+      server_facts:
+      become_user: cloak
+
+  roles:
+    # Downloads the server's certificate and other PKI information. For this
+    # demo, we keep all of the PKI files in /home/cloak/pki.
+    - { role: pki, become_user: cloak }
+
+    # General network configuration, including sysctl and iptables.
+    - { role: network }
+
+    # Installs a DNS resolver. Running a local DNS resolver is important for
+    # defending against malicious or compromised routers. See
+    # https://blog.getcloak.com/2015/07/01/cloak-ipv6-leakage-dns-hijacking/.
+    - { role: dns }
+
+    # Installs and configures OpenVPN.
+    - { role: openvpn }
+
+    # Installs and configures strongSwan.
+    - { role: strongswan }
+
+    # Sets up cron jobs.
+    - { role: maintenance }

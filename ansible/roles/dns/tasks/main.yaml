@@ -1,0 +1,8 @@
+- name: Install unbound
+  apt: name=unbound
+
+- name: Configure unbound
+  copy: dest=/etc/unbound/unbound.conf src=unbound.conf
+  notify: Restart unbound
+
+- meta: flush_handlers

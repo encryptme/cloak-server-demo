@@ -1,0 +1,41 @@
+- name: Install strongSwan
+  apt: name=strongswan
+
+# strongSwan needs access to /home/cloak/pki.
+- name: Update strongSwan AppArmor config
+  copy: dest=/etc/apparmor.d/local/usr.lib.ipsec.charon src=apparmor.d/usr.lib.ipsec.charon
+  notify:
+    - Reload apparmor
+    - Restart strongswan
+
+- name: strongswan.conf
+  template: dest=/etc/strongswan.conf src=strongswan.conf
+  notify: Restart strongswan
+
+- name: ipsec.conf
+  template: dest=/etc/ipsec.conf src=ipsec.conf
+  notify: ipsec reload
+
+- name: ipsec.secrets
+  copy: dest=/etc/ipsec.secrets src=ipsec.secrets
+  notify: ipsec reload
+
+- name: Install private key
+  file: path=/etc/ipsec.d/private/cloak.pem src=/home/cloak/pki/key.pem state=link
+  notify: ipsec reload
+
+- name: Install certificates
+  file: path=/etc/ipsec.d/certs/cloak.pem src=/home/cloak/pki/server.pem state=link
+  notify: ipsec reload
+
+- name: Install certificates
+  file: path=/etc/ipsec.d/certs/cloak-extras.pem src=/home/cloak/pki/extras.pem state=link
+  notify: ipsec reload
+
+- name: Install certificates
+  file: path=/etc/ipsec.d/cacerts/cloak-anchors.pem src=/home/cloak/pki/anchors.pem state=link
+  notify: ipsec rereadcacerts
+
+- name: Install CRLs
+  file: path=/etc/ipsec.d/crls/cloak-crls.pem src=/home/cloak/pki/crls.pem state=link
+  notify: ipsec rereadcrls

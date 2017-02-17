@@ -1,0 +1,18 @@
+- name: Reload apparmor
+  service: name=apparmor state=reloaded
+
+# This will kick off all connected clients.
+- name: Restart strongswan
+  service: name=strongswan state=restarted
+
+# This will reload /etc/ipsec.conf without disrupting existing connections.
+- name: ipsec reload
+  command: /usr/sbin/ipsec reload
+
+# This will reload /etc/ipsec.d/cacerts.
+- name: ipsec rereadcacerts
+  command: /usr/sbin/ipsec rereadcacerts
+
+# This will reload /etc/ipsec.d/crls.
+- name: ipsec rereadcrls
+  command: /usr/sbin/ipsec rereadcrls

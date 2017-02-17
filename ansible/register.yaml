@@ -1,0 +1,63 @@
+# This playbook registers the server with our team and requests a certificate.
+# It should only be run once.
+
+- hosts: all
+  become: true
+  tasks:
+    - user: name=cloak uid=2000 shell=/bin/bash home=/home/cloak
+    - copy: "dest=/etc/sudoers.d/cloak content='cloak ALL=(ALL) NOPASSWD:ALL\n' owner=root group=root mode=0440"
+      
+
+- hosts: all
+  become: true
+  become_user: cloak
+
+  vars_prompt:
+    - name: cloak_email
+      prompt: "Enter your Cloak email address"
+      private: no
+    - name: cloak_password
+      prompt: "Enter your Cloak password"
+      private: yes
+    - name: cloak_target
+      prompt: "Enter the target identifier (from your team dashboard)"
+      private: no
+    - name: cloak_base_url
+      prompt: "Cloak base URL (for internal use)"
+      private: no
+      default: "https://www.getcloak.com/"
+
+  tasks:
+    # Create some subdirectories that we'll need.
+    - file: path={{item}} state=directory
+      with_items:
+        - /home/cloak/bin
+        - /home/cloak/pki
+        - /home/cloak/pki/crls
+
+    # We'll install the cloak-server CLI into a new virtualenv.
+    - name: Install python-virtualenv
+      apt: name=python-virtualenv
+      become_user: root
+
+    - name: Create /home/cloak/venv
+      command: /usr/bin/virtualenv /home/cloak/venv creates=/home/cloak/venv
+
+    - name: Configure /home/cloak/venv
+      copy: dest=/home/cloak/venv/pip.conf src=files/pip.conf
+
+    - name: Install cloak-server to /home/cloak/venv
+      pip: name=cloak-server virtualenv=/home/cloak/venv
+
+    - name: Link cloak-server into /home/cloak/bin
+      file: path=/home/cloak/bin/cloak-server src=/home/cloak/venv/bin/cloak-server state=link
+
+    # Finally, we use the API client to register the server.
+    - name: Initialize .cloak.conf
+      template: dest=/home/cloak/.cloak.conf src=templates/cloak.conf
+    
+    - name: Register this server
+      command: /home/cloak/bin/cloak-server register --email {{cloak_email}} --password {{cloak_password}} --target {{cloak_target}}
+
+    - name: Request a certificate
+      command: /home/cloak/bin/cloak-server req --key /home/cloak/pki/key.pem

@@ -1,0 +1,16 @@
+# Linux won't forward packets without this setting.
+- name: Enable IP forwarding
+  copy: dest=/etc/sysctl.d/60-ip_forward.conf src=sysctl.d/ip_forward.conf
+  notify: procps
+
+# This is a basic set of iptables rules. See the template for notes on the
+# critical components.
+- name: Set up iptables.rules
+  template: dest=/etc/iptables.rules src=iptables.rules
+  notify: Restore iptables
+
+- name: Set up iptables.rules
+  copy: dest=/etc/network/if-up.d/iptables src=if-up.d/iptables mode=0755
+  notify: Restore iptables
+
+- meta: flush_handlers

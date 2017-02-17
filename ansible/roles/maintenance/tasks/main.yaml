@@ -1,0 +1,11 @@
+- name: Install cron scripts
+  copy: dest=/home/cloak/bin/ src={{item}} owner=cloak group=cloak mode=0755
+  with_fileglob: bin/*
+
+# Check for certificate renewals once per day.
+- name: PKI cron job
+  cron: cron_file=cloak user=cloak special_time=daily job=/home/cloak/bin/update-pki.sh
+
+# Check for updated CRLs every minute.
+- name: CRL cron job
+  cron: cron_file=cloak user=cloak job=/home/cloak/bin/refresh-crls.sh
