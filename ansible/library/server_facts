@@ -16,10 +16,19 @@ def main():
     except subprocess.CalledProcessError as e:
         module.fail_json(msg=unicode(e))
     else:
+        server = json.loads(output)
+
+        fqdns = list(frozenset(
+            config['fqdn']
+            for protocol in ['openvpn', 'ikev2']
+            for config in server['target'][protocol]
+        ))
+
         module.exit_json(
             changed=False,
             ansible_facts={
                 'cloak_server': json.loads(output),
+                'cloak_fqdns': fqdns,
             },
         )
 

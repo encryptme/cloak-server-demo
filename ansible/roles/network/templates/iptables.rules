@@ -6,8 +6,8 @@
 -A INPUT -i lo -j ACCEPT
 -A INPUT ! -i lo -d 127.0.0.0/8 -j REJECT
 
-# Accept all established inbound connections.
 -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+-A INPUT -p icmp -j ACCEPT
 
 # SSH
 -A INPUT -p tcp --dport ssh -j ACCEPT

@@ -20,7 +20,8 @@ particular target, so you'll need the target ID to proceed.
 
 You'll also need a clean Ubuntu 16.04 machine ready to go. Any cheap consumer
 VPS is fine for our purposes. The machine obviously needs to be reachable via
-the FQDN that you used to register the target.
+the FQDN that you used to register the target. To support ansible, it also needs
+to have Python installed.
 
 Finally, you'll need `ansible`_ available in your shell. This demo was
 originally developed with ansible 2.2.1.
@@ -85,16 +86,19 @@ periodically check for updated certificates and CRLs. The playbooks are well
 documented, so you can refer to them directly for the details.
 
 
-Caveats
--------
+letsencrypt
+-----------
 
-This demo produces a *mostly* functional Cloak team endpoint. One important
-exception is that Cloak for iOS relies on the iOS system anchor certificates, so
-it will only connect to a server that uses an entity certificate in the public
-internet PKI. The easiest way to make that happen is probably to get a free
-certificate from `letsencrypt`_ and add it (along with the related anchor, etc.)
-to the appropriate folders in ``/etc/ipsec.d/``. This step is not currently
-automated.
+Most Cloak clients operate entirely within your private PKI, but some of them
+require servers to be authenticated by the public internet PKI (at the time of
+writing, this just includes Cloak for iOS). By default, we'll obtain a free
+certificate from `letsencrypt`_ so that you can test all of the clients, but you
+can decline this step if you prefer, or if the server is not currently reachable
+by the FQDNs that you have provided.
+
+If you initially skip the letsencrypt step and then change your mind later, you
+can enable it in ``/etc/ansible/facts.d/cloak.fact``, then run the
+``letsencrypt.yaml`` and ``deploy.yaml`` playbooks again.
 
 
 .. _letsencrypt: https://letsencrypt.org/

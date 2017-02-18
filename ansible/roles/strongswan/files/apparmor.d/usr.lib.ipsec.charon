@@ -1,1 +1,2 @@
 /home/cloak/pki/*     r,
+/etc/letsencrypt/**   r,

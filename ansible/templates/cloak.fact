@@ -1,0 +1,3 @@
+[config]
+email = {{cloak_email}}
+letsencrypt = {{cloak_letsencrypt}}

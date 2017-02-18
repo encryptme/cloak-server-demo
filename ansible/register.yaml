@@ -12,12 +12,6 @@
   become: true
   become_user: cloak
 
-  # This is just for development and testing. There's no need to do this in
-  # your own deployments.
-  pre_tasks:
-    - name: Initialize .cloak.conf
-      template: dest=/home/cloak/.cloak.conf src=templates/cloak.conf
-
   vars_prompt:
     - name: cloak_email
       prompt: "Enter your Cloak email address"
@@ -28,6 +22,22 @@
     - name: cloak_target
       prompt: "Enter the target identifier (from your team dashboard)"
       private: no
+    - name: cloak_letsencrypt
+      prompt: "Would you like a free letsencrypt certificate for strongSwan (yes/no)?"
+      private: no
+      default: 'yes'
+
+  # This is just a bit of demo logistics. There's no need to do any of this in
+  # your own deployments.
+  pre_tasks:
+    - name: Initialize .cloak.conf
+      template: dest=/home/cloak/.cloak.conf src=templates/cloak.conf
+    - name: Save preferences
+      file: path=/etc/ansible/facts.d state=directory
+      become_user: root
+    - name: Save preferences
+      template: dest=/etc/ansible/facts.d/cloak.fact src=templates/cloak.fact
+      become_user: root
 
   tasks:
     # Create some subdirectories that we'll need.
@@ -53,10 +63,14 @@
 
     - name: Link cloak-server into /home/cloak/bin
       file: path=/home/cloak/bin/cloak-server src=/home/cloak/venv/bin/cloak-server state=link
-    
+
     # Finally, we use the API client to register the server.
     - name: Register this server
       command: /home/cloak/bin/cloak-server register --email {{cloak_email}} --password {{cloak_password}} --target {{cloak_target}}
 
     - name: Request a certificate
       command: /home/cloak/bin/cloak-server req --key /home/cloak/pki/key.pem
+
+
+- include: letsencrypt.yaml
+  when: ansible_local.cloak.config.letsencrypt|bool

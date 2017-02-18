@@ -1,7 +1,7 @@
 - name: Install strongSwan
   apt: name=strongswan
 
-# strongSwan needs access to /home/cloak/pki.
+# Give strongSwan access to our centralized PKI files.
 - name: Update strongSwan AppArmor config
   copy: dest=/etc/apparmor.d/local/usr.lib.ipsec.charon src=apparmor.d/usr.lib.ipsec.charon
   notify:
@@ -17,25 +17,37 @@
   notify: ipsec reload
 
 - name: ipsec.secrets
-  copy: dest=/etc/ipsec.secrets src=ipsec.secrets
+  template: dest=/etc/ipsec.secrets src=ipsec.secrets
   notify: ipsec reload
 
-- name: Install private key
+# Cloak PKI
+- name: Install Cloak private key
   file: path=/etc/ipsec.d/private/cloak.pem src=/home/cloak/pki/key.pem state=link
   notify: ipsec reload
 
-- name: Install certificates
+- name: Install Cloak certificates
   file: path=/etc/ipsec.d/certs/cloak.pem src=/home/cloak/pki/server.pem state=link
   notify: ipsec reload
 
-- name: Install certificates
+- name: Install Cloak certificates
   file: path=/etc/ipsec.d/certs/cloak-extras.pem src=/home/cloak/pki/extras.pem state=link
   notify: ipsec reload
 
-- name: Install certificates
+- name: Install Cloak certificates
   file: path=/etc/ipsec.d/cacerts/cloak-anchors.pem src=/home/cloak/pki/anchors.pem state=link
   notify: ipsec rereadcacerts
 
-- name: Install CRLs
+- name: Install Cloak CRLs
   file: path=/etc/ipsec.d/crls/cloak-crls.pem src=/home/cloak/pki/crls.pem state=link
   notify: ipsec rereadcrls
+
+# letsencrypt PKI
+- name: Install letsencrypt private key
+  file: path=/etc/ipsec.d/private/letsencrypt.pem src=/etc/letsencrypt/live/{{cloak_fqdns[0]}}/privkey.pem state=link
+  notify: ipsec reload
+  when: ansible_local.cloak.config.letsencrypt|bool
+
+- name: Install letsencrypt certificates
+  file: path=/etc/ipsec.d/certs/letsencrypt.pem src=/etc/letsencrypt/live/{{cloak_fqdns[0]}}/fullchain.pem state=link
+  notify: ipsec reload
+  when: ansible_local.cloak.config.letsencrypt|bool
