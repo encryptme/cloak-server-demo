@@ -30,8 +30,8 @@
   notify: ipsec reload
 
 - name: Install Cloak certificates
-  file: path=/etc/ipsec.d/certs/cloak-extras.pem src=/home/cloak/pki/extras.pem state=link
-  notify: ipsec reload
+  file: path=/etc/ipsec.d/cacerts/cloak-client-ca.pem src=/home/cloak/pki/client_ca.pem state=link
+  notify: ipsec rereadcacerts
 
 - name: Install Cloak certificates
   file: path=/etc/ipsec.d/cacerts/cloak-anchors.pem src=/home/cloak/pki/anchors.pem state=link
