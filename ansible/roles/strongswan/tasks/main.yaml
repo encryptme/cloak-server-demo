@@ -34,7 +34,7 @@
   notify: ipsec rereadcacerts
 
 - name: Install Cloak certificates
-  file: path=/etc/ipsec.d/cacerts/cloak-anchors.pem src=/home/cloak/pki/anchors.pem state=link
+  file: path=/etc/ipsec.d/cacerts/cloak-anchor.pem src=/home/cloak/pki/anchor.pem state=link
   notify: ipsec rereadcacerts
 
 - name: Install Cloak CRLs
