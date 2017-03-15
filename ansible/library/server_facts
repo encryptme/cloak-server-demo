@@ -27,7 +27,7 @@ def main():
         module.exit_json(
             changed=False,
             ansible_facts={
-                'cloak_server': json.loads(output),
+                'cloak_server': server,
                 'cloak_fqdns': fqdns,
             },
         )
