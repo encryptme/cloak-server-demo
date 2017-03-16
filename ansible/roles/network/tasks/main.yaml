@@ -1,7 +1,6 @@
 # Linux won't forward packets without this setting.
 - name: Enable IP forwarding
-  copy: dest=/etc/sysctl.d/60-ip_forward.conf src=sysctl.d/ip_forward.conf
-  notify: procps
+  sysctl: name=net.ipv4.ip_forward value=1 sysctl_set=yes reload=yes
 
 # This is a basic set of iptables rules. See the template for notes on the
 # critical components.
