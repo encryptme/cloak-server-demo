@@ -72,5 +72,10 @@
       command: /home/cloak/bin/cloak-server req --key /home/cloak/pki/key.pem
 
 
+# Refresh ansible_local now that cloak.fact is in place.
+- hosts: all
+  gather_facts: true
+
+
 - include: letsencrypt.yaml
   when: ansible_local.cloak.config.letsencrypt|bool
