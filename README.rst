@@ -8,6 +8,12 @@ of as executable documentation. Running these against a clean install of Ubuntu
 expected that administrators will use this project as a guide to implementing
 their own deployment automation for producing production-ready Cloak endpoints.
 
+Remember that unlike its companions, this repository is just documentation and
+sample code. If any parts of it are directly applicable to your own situation,
+don't hesitate to copy them. This project itself makes absolutely no guarantees
+about the demo servers that it configures and it may make backward-incompatible
+changes of any kind at any time for any reason.
+
 
 Setting up
 ----------
