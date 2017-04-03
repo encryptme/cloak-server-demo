@@ -29,6 +29,14 @@ VPS is fine for our purposes. The machine obviously needs to be reachable via
 the FQDN that you used to register the target. To support ansible, it also needs
 to have Python installed.
 
+If this machine has an external firewall, you'll need to allow incoming
+connections on tcp/22 (ssh), udp/443 (openvpn), tcp/443 (openvpn), udp/500
+(isakmp) and udp/4500 (ipsec-nat-t). Also protocol 50 (ipsec). To acquire a
+letsencrypt certificate, we'll need tcp/80. The local iptables will be
+configured with ansible/roles/network/templates/iptables.rules, so you can refer
+to that for details. Note that the openvpn ports are technically at the server's
+discretion, but they're currently always 443.
+
 Finally, you'll need `ansible`_ available in your shell. This demo was
 originally developed with ansible 2.2.1.
 
